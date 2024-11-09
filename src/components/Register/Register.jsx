@@ -1,7 +1,8 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { useState } from "react";
 import auth from "../../Firebase/Firebase.init.js";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   const [user, setUser] = useState("");
@@ -42,6 +43,18 @@ const Register = () => {
         console.log(res.user);
         setError("");
         setSuccess(true);
+
+
+        // send verification email
+        sendEmailVerification(auth.currentUser)
+        .then(res=>{
+          console.log(res);
+        })
+        .catch(err=>{
+          console.log(err.message);
+        })
+
+
       })
       .catch((err) => {
         console.log(err.message);
@@ -124,7 +137,7 @@ const Register = () => {
             placeholder="Password"
           />
          <button onClick={handleVisibilytyOfPassword}>
-         {visible ? 
+         {!visible ? 
           <IoEyeOffOutline /> 
           :
            <IoEyeOutline />}
@@ -141,6 +154,7 @@ const Register = () => {
         </div>
        
       </form>
+      <p>Alraedy have a account? <Link to='/login'>Login</Link></p>
     </div>
   );
 };
