@@ -1,26 +1,83 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import auth from "../../Firebase/Firebase.init.js";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 
 const Register = () => {
-
-  const [user, setUser] = useState('')
-
+  const [user, setUser] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(null);
+  const [seePassword, setSeePassword] = useState('');
+  const [textType, setTextType] = useState('password');
+  const [visible, setVisible] = useState(true);
+  const [submitBtnDisAble, setSubmitBtnDisAble] = useState(false);
 
   const handleRegister = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
-    createUserWithEmailAndPassword(auth, email, password)
-    .then(res=>{
-      setUser(res.user);
-      console.log(res.user);
-    })
-    .catch(err=>{
-      console.log(err.message);
-    })
+    if (!submitBtnDisAble) {
+      return;
+    }
 
+    if (password.length < 6) {
+      setError("Password should be at least 6 character");
+      return;
+    }
+    setSuccess(false);
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+
+    if (!passwordRegex.test(password)) {
+      setError(
+        "Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (e.g., @, $, !, %, *, ?, &)."
+      );
+      return;
+    }
+   
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((res) => {
+        setUser(res.user);
+        console.log(res.user);
+        setError("");
+        setSuccess(true);
+      })
+      .catch((err) => {
+        console.log(err.message);
+        setError(err.message);
+        console.log(err.message.Firebase);
+        setSuccess(false);
+      });
   };
+  const handlePasssChange=(e)=>{
+    // console.log(e.target.value);
+    setSeePassword(e.target.value)
+
+
+  }
+  const handleVisibilytyOfPassword=(e)=>{
+    e.preventDefault()
+    setVisible(!visible)
+    console.log(visible);
+
+    if (visible) {
+      setTextType('text')
+    }
+    else{
+      setTextType('password')
+
+    }
+
+    console.log(seePassword);
+  }
+  const handleCheckbox=(e)=>{
+    // e.preventDefault()
+    setSubmitBtnDisAble(e.target.checked);
+  }
+
+  
+
   return (
     <div className="w-1/2 mx-auto space-y-5">
       <h1 className="text-4xl my-8">Register</h1>
@@ -55,11 +112,34 @@ const Register = () => {
               clipRule="evenodd"
             />
           </svg>
-          <input type="password" className="grow"  name="password" placeholder="Password"/>
+          <input
+            
+              type={textType}
+            
+            className="grow"
+            name="password"
+            onChange={handlePasssChange}
+            value={seePassword}
+  
+            placeholder="Password"
+          />
+         <button onClick={handleVisibilytyOfPassword}>
+         {visible ? 
+          <IoEyeOffOutline /> 
+          :
+           <IoEyeOutline />}
+         </button>
         </label>
-        <div className="form-control mt-6">
-          <button className="btn btn-accent btn-wide">Login</button>
+        <p className="text-red-600">{error}</p>
+
+        {success && (
+          <p className="text-green-600">Yahoooooo, sign up hoyaa gese..</p>
+        )}
+        <input type="checkbox" name="" id="" onClick={handleCheckbox} />
+        <div  className="form-control mt-6">
+          <button  className="btn btn-accent btn-wide">Login</button>
         </div>
+       
       </form>
     </div>
   );
