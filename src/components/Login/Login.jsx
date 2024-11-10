@@ -1,12 +1,17 @@
 import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import auth from "../../Firebase/Firebase.init.js";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import AuthProvider, { AuthContext } from "../../AuthProvider/AuthProvider.jsx";
 
 const Login = () => {
+    const [user, setUser] = useState('')
     const [success, setSuccess] = useState(false)
     const [error, setError] = useState('')
     const emailRef = useRef()
+
+    const {name} = useContext(AuthContext)
+    console.log(name);
 
 
     const handleLogin=(e)=>{
@@ -24,6 +29,7 @@ setError('')
                 return;
             }
             setSuccess(true)
+            setUser(res.user.photoURL)
             console.log(res.user);
         })
         .catch(err=>{
@@ -56,6 +62,7 @@ setError('')
 
   return (
     <div className="hero bg-base-200 min-h-screen">
+        
       <div className="hero-content flex-col lg:flex-row-reverse">
         <div className="text-center lg:text-left">
           <h1 className="text-5xl font-bold">Login now!</h1>
@@ -109,6 +116,7 @@ setError('')
           }
         </div>
       </div>
+      <img src={user} alt="" />
     </div>
   );
 };
